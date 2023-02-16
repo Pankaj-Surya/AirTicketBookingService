@@ -5,7 +5,9 @@ const {AppError,ValidationError} = require('../utils/index')
 class BookingRepository {
   async create (data){
     try {
+      console.log("Inside Booking create Controller")
       const booking = await Booking.create(data);
+      console.log(booking.data)
       return booking;  
     } catch (error) {
         if(error.name == 'SequelizeValidationError' ){
@@ -18,6 +20,24 @@ class BookingRepository {
             StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async update(bookingId, data) {
+    try {
+        const booking = await Booking.findByPk(bookingId);
+        if(data.status) {
+            booking.status = data.status;
+        }
+        await booking.save();
+        return booking;
+    } catch (error) {
+        throw new AppError(
+            'RepositoryError', 
+            'Cannot update Booking', 
+            'There was some issue updating the booking, please try again later',
+            StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+ }
+
 }
 
 module.exports = BookingRepository
